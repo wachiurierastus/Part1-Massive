@@ -44,6 +44,25 @@ def df_to_excel(df: DataFrame, output_path: str) -> bool:
         raise Exception("Error saving to excel")
 
 
+def directory_checker(directory_path: str, purpose: str) -> bool:
+    """
+    This function checks if the directory path exists
+    :param purpose:
+    :param use:
+    :param directory_path:
+    :return:
+    """
+    # Check if directory exists, if it doesn't check its use, if use is output, create the directory in the parent of
+    # input directory.
+    if os.path.isdir(directory_path):
+        return True
+    else:
+        if purpose == "output":
+            # Create the directory
+            os.mkdir(directory_path)
+            return True
+        else:
+            raise Exception("Invalid directory path")
 
 
 def full_path_generator(directory_path: str, filepath: str) -> str:
@@ -58,9 +77,10 @@ def full_path_generator(directory_path: str, filepath: str) -> str:
     return full_path
 
 
-def list_of_valid_files(input_directory_path) -> list:
+def list_of_valid_files(input_directory_path: str) -> list:
     """
         This function returns a list of valid jsonl files in the directory path
+        :param input_directory_path:
         :param self:
         :return:
         """
@@ -75,3 +95,15 @@ def list_of_valid_files(input_directory_path) -> list:
             # Appending the file name to the list
             files.append(file)
     return files
+
+
+def save_to_jsonl(df: DataFrame, output_path: str, lines: bool) -> bool:
+    try:
+        if df.empty:
+            raise Exception("Dataframe is empty")
+        else:
+            df.to_json(output_path, orient="records", lines=lines)
+            return True
+    except Exception as e:
+        print(e)
+        raise Exception("Error saving to jsonl")

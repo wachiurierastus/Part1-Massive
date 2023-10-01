@@ -32,23 +32,19 @@ class TaskTwo:
             partitions.append(dff)
         return partitions
 
-    def task22(self, output_directory_path: str, input_directory_path: str, languages: list) -> None:
-        files = self.parser.list_of_valid_files(directory_path=input_directory_path)
+    def task22(self,output_directory_path: str, input_directory_path: str, languages: list) -> None:
+        files = list_of_valid_files(input_directory_path=input_directory_path)
         # Check directories exist
-        if (self.parser.directory_checker(directory_path=input_directory_path, purpose="input") and
-                self.parser.directory_checker(directory_path=output_directory_path, purpose="output")):
+        if (directory_checker(directory_path=input_directory_path, purpose="input") and
+                directory_checker(directory_path=output_directory_path, purpose="output")):
             supported_langs = []
-            counter = 0
             # language generating function.
             for file in files:
                 language_code = file[-11:-9]
                 supported_langs.append(language_code)
-                # print(files)
-            print(supported_langs)
             for file in files:
                 for i in range(len(languages)):
-                    counter = counter + 1
-                    if languages[i] in supported_langs:
+                    if file[-11:-9] == languages[i]:
                         file_path = full_path_generator(directory_path=input_directory_path, filepath=file)
                         print(file_path)
                         dff = dataframe_gen_from_jsonl(file_path=file_path)
@@ -65,37 +61,46 @@ class TaskTwo:
                             out_dir_path = os.path.join(output_directory_path, f"{partition_name}")
                             os.makedirs(out_dir_path, exist_ok=True)
                             # print(out_dir_path)
-                            output_path = full_path_generator(out_dir_path,
-                                                                          f"{languages[i]}-1{partition_name}.jsonl")
+                            output_path = full_path_generator(out_dir_path, f"{languages[i]}-{partition_name}.jsonl")
                             print(output_path)
-                            self.parser.save_to_jsonl(df=partitions[j], output_path=output_path)
-                            print(counter)
+                            save_to_jsonl(df=partitions[j], output_path=output_path, lines=True)
+                            json_object = json.loads("outputs\\train.json")
+                            print(json.dumps(json_object, indent=4))
                     else:
-                        raise Exception("Invalid language code")
-                break
+                        continue
 
         else:
             raise Exception("Invalid directory path")
 
-    def task23(self, lang_input_directory: str, input_directory: str) -> json:
+    import json
+    df = DataFrame
 
+    def task23(self, lang_input_directory: str) -> json:
         # check if the directory name ends in train
-
         if lang_input_directory[-5:] == 'train':
             df_list = []
             print('yes')
-            files = self.parser.list_of_valid_files(directory_path=lang_input_directory)
+            files = list_of_valid_files(input_directory_path=lang_input_directory)
             # print(files)
-            for file in files:
-                # print(file)
-                language_code = file[-11:-9]
-                print(language_code)
-                df = dataframe_gen_from_jsonl(full_path_generator(directory_path=
-                                                                                          lang_input_directory, filepath=file))
-                new_df = self.parser.per_language_pivot_en(lang_directory_path=lang_input_directory, filepath=file,
-                                                           input_directory_path=input_directory)
+            language_codes = []
+            for i in range(len(files)):
+                file = files[i]
+                language_code = file[-15:-12]
+                language_codes.append(language_code)
+                new_df = dataframe_gen_from_jsonl(
+                    file_path=full_path_generator(directory_path=lang_input_directory, filepath=file))
+                new_df = new_df[["id", "utt"]]
+                new_df = new_df.rename(columns={"id": "id", "utt": f"{language_code}_utt"})
+                new_df = new_df[['id', f'{language_code}_utt']]
+                new_df.reset_index(drop=True, inplace=True)
                 df_list.append(new_df)
-                # print(df_list)
-            # return pd.concat(df_list)
+            df = pd.concat(df_list, axis=1, join="inner")
+            df.head(40)
+            df.reset_index(drop=True, inplace=True)
+            # Remove the redundant columns of the merged dataFrame
+            df = df.loc[:, ~df.columns.duplicated()]
+            save_to_jsonl(df=df, output_path="outputs\\train.jsonl", lines=False)
+            return df
+
         else:
             raise Exception("Invalid directory")
