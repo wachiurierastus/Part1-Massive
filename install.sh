@@ -28,15 +28,15 @@ source env/bin/activate
 pip install -r requirements.txt
 
 # Elevate the generate shell
-chmod +x generate.sh
+echo "Needs admin, Enter sudo password below:"
+sudo chmod +x generate.sh
 
 echo "Installation complete."
 
-# To Run the first task, run:
+echo "To Run the first task, run: "
 
-# ./generate.sh
+echo" # ./generate.sh"
+echo"To Run the second task, run:"
 
-# To Run the second task, run:
-
-# ./generate.sh task2
+echo "# ./generate.sh task2"
 
