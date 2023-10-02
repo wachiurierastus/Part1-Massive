@@ -4,7 +4,7 @@ import os
 import pandas as pd
 from pandas import DataFrame
 
-import functions
+import google_drive_save
 import FileParsing
 from FileParsing import *
 
@@ -99,21 +99,22 @@ class TaskTwo:
             df.reset_index(drop=True, inplace=True)
             # Remove the redundant columns of the merged dataFrame
             df = df.loc[:, ~df.columns.duplicated()]
-            df = df.loc[:, ~df.columns.duplicated()]
+            print(df.head())
             df = df[['id', 'en_utt', 'de_utt', 'sw_utt']]
-            df.to_json("outputs\\train.json", orient="records", lines=True, force_ascii=False)
-            with open("../outputs/train.jsonl", "r") as read_file:
+            df.to_json("../outputs/train.json", orient="records", lines=False, force_ascii=False)
+            with open("../outputs/train.json", "r") as read_file:
                 # print("Read JSON file")
                 jsonsl = json.load(read_file)
                 pretty_json = json.dumps(jsonsl, indent=4, separators=(',', ': '), ensure_ascii=False)
                 # print("Displaying Pretty Printed JSON Data")
-                json.dump(pretty_json, open("../outputs/trains.json", "w", encoding="utf8", errors="ignore"), indent=4,
+                print(self.output_directory_path)
+                json.dump(pretty_json, open(f"{self.output_directory_path}/trains.json", "w", encoding="utf8", errors="ignore"), indent=4,
                           separators=(',', ': '), ensure_ascii=False)
                 return pretty_json
         else:
             raise Exception("Invalid directory")
 
     def task24(self) :
-        functions.upload_to_gdrive(source_directory=self.output_directory_path, destination_folder_name="outputs",
+        google_drive_save.upload_to_gdrive(source_directory=self.output_directory_path, destination_folder_name="outputs",
                                    parent_folder_name="cat1")
 

@@ -1,6 +1,6 @@
 from pydrive.auth import GoogleAuth
 
-from src import functions
+from src import google_drive_save
 
 
 def trial_upload():

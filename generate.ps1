@@ -10,6 +10,9 @@ switch ($task) {
     "task2" {
         python -m main --task task2 --input "..\data" --output "..\outputs"
     }
+    "save" {
+        python -m main --task save --input "..\data" --output "..\outputs" --save True
+    }
     Default {
         Write-Host "Invalid task: $task. Use 'task1' or 'task2'."
         Exit 1

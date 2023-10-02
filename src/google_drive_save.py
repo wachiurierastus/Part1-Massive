@@ -31,6 +31,8 @@ def upload_files_in_directory(drive, parent_id, local_directory):
                 'parents': [{'id': parent_id}]
             })
             file.Upload()
+            # Uploading files to google drive
+            print("Uploading - " + f"{item}")
         elif os.path.isdir(item_path):
             folder = create_directory(drive, parent_id, item)
             upload_files_in_directory(drive, folder['id'], item_path)
@@ -44,7 +46,5 @@ def upload_to_gdrive(source_directory, destination_folder_name, parent_folder_na
     parent_folder = create_directory(drive, "root", parent_folder_name)
     destination_folder = create_directory(drive, parent_folder['id'], destination_folder_name)
     upload_files_in_directory(drive, destination_folder['id'], source_directory)
+
     print("Upload completed!")
-
-
-

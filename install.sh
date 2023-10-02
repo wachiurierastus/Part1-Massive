@@ -30,6 +30,7 @@ pip install -r requirements.txt
 # Elevate the generate shell
 echo "Needs admin, Enter sudo password below:"
 sudo chmod +x generate.sh
+mkdir /outputs
 
 echo "Installation complete."
 

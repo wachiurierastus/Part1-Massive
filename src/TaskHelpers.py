@@ -22,8 +22,8 @@ class TaskHelpers:
         if "en-US.jsonl" in files:
             # Getting the full path of the en-US.jsonl file
             en_us_path = FileParsing.full_path_generator(directory_path=self.input_directory_path,
-                                                         filepath="../en-US.jsonl")
-            # print(en_us_path)
+                                                         filepath="en-US.jsonl")
+            #print(en_us_path)
             # Generating the dataframe
             en_us_df = FileParsing.dataframe_gen_from_jsonl(file_path=en_us_path)
             # Renaming the columns
@@ -44,8 +44,8 @@ class TaskHelpers:
         """
 
         # Generating english base DataFrame
-        print("Hi" + str(self.input_directory_path))
-        english_base_df = self.en_base_df(input_directory_path=self.input_directory_path)
+        #print("Hi" + str(self.input_directory_path))
+        english_base_df = self.en_base_df()
         # Getting the language code from the file path
         language_code = filepath[-11:-9]
         print(filepath)

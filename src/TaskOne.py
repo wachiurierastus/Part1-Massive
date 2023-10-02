@@ -47,6 +47,7 @@ class TaskOne:
                 output_path = file[1]
                 # logging.info(f"Writing the dataframe to excel file: {output_path}")
                 df.to_excel(output_path, index=False)
+                print(f"Writing the dataframe to excel file: {output_path}")
         except Exception as e:
             # Printing the error message
             print(e)
