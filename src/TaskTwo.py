@@ -1,4 +1,11 @@
+import json
+import os
+
+import pandas as pd
+from pandas import DataFrame
+
 import functions
+import FileParsing
 from FileParsing import *
 
 
@@ -8,60 +15,7 @@ class TaskTwo:
         self.input_directory_path = input_directory_path
         self.output_directory_path = output_directory_path
         self.lang_input_directory = os.path.join(output_directory_path, "train")
-'''
-    def drive_upload(self):
-        from pydrive.drive import GoogleDrive
-        from pydrive.auth import GoogleAuth
 
-        import os
-
-        # Authenticate Google services
-        gauth = GoogleAuth()
-
-        # load credentials or create empty credentials if none exist
-        gauth.LoadCredentialsFile("mycreds.txt")
-
-        # If you don't have Google service credentials
-        if gauth.credentials is None:
-            # Automatically receive authorization code from user and configure local web server
-            gauth.LocalWebserverAuth()
-        # if the access token does not exist or has expired
-        elif gauth.access_token_expired:
-            # refresh authorization for google services
-            gauth.Refresh()
-        # if none match
-        else:
-            # Authorize Google services
-            gauth.Authorize()
-        # save credentials to file in txt format
-        gauth.SaveCredentialsFile("mycreds.txt")
-
-        # Authentication process for Google Drive
-        drive = GoogleDrive(gauth)
-
-        # specify folder path to upload
-        path = "../outputs"
-        # File ID to upload to GOOGLE DRIVE
-        folder_id = '1J8TXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX'
-        # loop through all files in the folder
-        for x in os.listdir(path):
-            # Create GoogleDriveFile object
-            # f = drive.CreateFile({'title' : x})
-            f = drive.CreateFile({"parents": [{"id": folder_id}, ]})
-            # file title
-            f['title'] = x
-            # set local file and upload
-            print(f)
-            f.SetContentFile(os.path.join(path, x))
-            print(f)
-            # Upload to Google Drive
-            f.Upload()
-            print(f)
-
-            f = None
-            
-    '''
-    
     @staticmethod
     def partition(df: DataFrame, part: str) -> DataFrame:
         part = part.lower()
@@ -80,10 +34,10 @@ class TaskTwo:
         return partitions
 
     def task22(self, output_directory_path: str, input_directory_path: str, languages: list) -> None:
-        files = list_of_valid_files(input_directory_path=input_directory_path)
+        files = FileParsing.list_of_valid_files(input_directory_path=input_directory_path)
         # Check directories exist
-        if (directory_checker(directory_path=input_directory_path, purpose="input") and
-                directory_checker(directory_path=output_directory_path, purpose="output")):
+        if (FileParsing.directory_checker(directory_path=input_directory_path, purpose="input") and
+                FileParsing.directory_checker(directory_path=output_directory_path, purpose="output")):
             supported_langs = []
             # language generating function.
             for file in files:
@@ -92,9 +46,9 @@ class TaskTwo:
             for file in files:
                 for i in range(len(languages)):
                     if file[-11:-9] == languages[i]:
-                        file_path = full_path_generator(directory_path=input_directory_path, filepath=file)
+                        file_path = FileParsing.full_path_generator(directory_path=input_directory_path, filepath=file)
                         print(file_path)
-                        dff = dataframe_gen_from_jsonl(file_path=file_path)
+                        dff = FileParsing.dataframe_gen_from_jsonl(file_path=file_path)
                         partitions = self.partitions_gen(df=dff)
                         for j in range(len(partitions)):
                             partition_name = ""
@@ -108,9 +62,9 @@ class TaskTwo:
                             out_dir_path = os.path.join(output_directory_path, f"{partition_name}")
                             os.makedirs(out_dir_path, exist_ok=True)
                             # print(out_dir_path)
-                            output_path = full_path_generator(out_dir_path, f"{languages[i]}-{partition_name}.jsonl")
+                            output_path = FileParsing.full_path_generator(out_dir_path, f"{languages[i]}-{partition_name}.jsonl")
                             print(output_path)
-                            save_to_jsonl(df=partitions[j], output_path=output_path, lines=True)
+                            FileParsing.save_to_jsonl(df=partitions[j], output_path=output_path, lines=True)
                     else:
 
                         continue
@@ -126,15 +80,15 @@ class TaskTwo:
         if self.lang_input_directory[-5:] == 'train':
             df_list = []
             print('yes')
-            files = list_of_valid_files(input_directory_path=self.lang_input_directory)
+            files = FileParsing.list_of_valid_files(input_directory_path=self.lang_input_directory)
             # print(files)
             language_codes = []
             for i in range(len(files)):
                 file = files[i]
                 language_code = file[-15:-12]
                 language_codes.append(language_code)
-                new_df = dataframe_gen_from_jsonl(
-                    file_path=full_path_generator(directory_path=self.lang_input_directory, filepath=file))
+                new_df = FileParsing.dataframe_gen_from_jsonl(
+                    file_path=FileParsing.full_path_generator(directory_path=self.lang_input_directory, filepath=file))
                 new_df = new_df[["id", "utt"]]
                 new_df = new_df.rename(columns={"id": "id", "utt": f"{language_code}_utt"})
                 new_df = new_df[['id', f'{language_code}_utt']]

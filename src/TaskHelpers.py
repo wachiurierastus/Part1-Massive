@@ -1,3 +1,5 @@
+from pandas import DataFrame
+
 import FileParsing
 from FileParsing import *
 import pandas as pd
@@ -43,7 +45,7 @@ class TaskHelpers:
 
         # Generating english base DataFrame
         print("Hi" + str(self.input_directory_path))
-        english_base_df = en_base_df(input_directory_path=self.input_directory_path)
+        english_base_df = self.en_base_df(input_directory_path=self.input_directory_path)
         # Getting the language code from the file path
         language_code = filepath[-11:-9]
         print(filepath)
@@ -68,7 +70,7 @@ class TaskHelpers:
         :return:
         '''
         # Generating english base DataFrame
-        english_base_df = en_base_df(input_directory_path=self.input_directory_path)
+        english_base_df = self.en_base_df()
         # Getting the language code from the file path
         language_code = filepath[-11:-9]
         print(filepath)

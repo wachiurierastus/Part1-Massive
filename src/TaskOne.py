@@ -1,3 +1,6 @@
+import logging
+import os
+
 import TaskHelpers
 from TaskHelpers import *
 import FileParsing
@@ -42,7 +45,7 @@ class TaskOne:
                 # Writing the dataframe to excel
                 df = file[0]
                 output_path = file[1]
-                logging.info(f"Writing the dataframe to excel file: {output_path}")
+                # logging.info(f"Writing the dataframe to excel file: {output_path}")
                 df.to_excel(output_path, index=False)
         except Exception as e:
             # Printing the error message
