@@ -1,13 +1,22 @@
-if it is task 1.......
+#!/bin/bash
 
-python -m main --task task1 --input "data" --output "outputs"
+task="$1"
+
+case "$task" in
+  task1)
+    python -m main --task task1 --input "/data" --output "outputs"
+    ;;
+  task2)
+    python -m main --task task2 --input "/data" --output "outputs"
+    ;;
+  *)
+    echo "Invalid task: $task. Use 'task1' or 'task2'."
+    exit 1
+    ;;
+esac
 
 
-if it is task 2
- python -m main --task task2 --input "data" --output "outputs"
 
-save to google:
-yes
-no
+
 
 
