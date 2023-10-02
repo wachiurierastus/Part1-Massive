@@ -1,8 +1,3 @@
-import logging
-
-import pandas as pd
-from pandas import DataFrame
-import FileParsing
 import functions
 from FileParsing import *
 
@@ -12,9 +7,58 @@ class TaskTwo:
     def __init__(self, input_directory_path: str, output_directory_path: str):
         self.input_directory_path = input_directory_path
         self.output_directory_path = output_directory_path
-        self.parser = FileParsing(input_directory_path=input_directory_path,
-                                  output_directory_path=output_directory_path)
+        self.lang_input_directory = os.path.join(output_directory_path, "train")
 
+    def drive_upload(self):
+        from pydrive.drive import GoogleDrive
+        from pydrive.auth import GoogleAuth
+
+        import os
+
+        # Authenticate Google services
+        gauth = GoogleAuth()
+
+        # load credentials or create empty credentials if none exist
+        gauth.LoadCredentialsFile("mycreds.txt")
+
+        # If you don't have Google service credentials
+        if gauth.credentials is None:
+            # Automatically receive authorization code from user and configure local web server
+            gauth.LocalWebserverAuth()
+        # if the access token does not exist or has expired
+        elif gauth.access_token_expired:
+            # refresh authorization for google services
+            gauth.Refresh()
+        # if none match
+        else:
+            # Authorize Google services
+            gauth.Authorize()
+        # save credentials to file in txt format
+        gauth.SaveCredentialsFile("mycreds.txt")
+
+        # Authentication process for Google Drive
+        drive = GoogleDrive(gauth)
+
+        # specify folder path to upload
+        path = "../outputs"
+        # File ID to upload to GOOGLE DRIVE
+        folder_id = '1J8TXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX'
+        # loop through all files in the folder
+        for x in os.listdir(path):
+            # Create GoogleDriveFile object
+            # f = drive.CreateFile({'title' : x})
+            f = drive.CreateFile({"parents": [{"id": folder_id}, ]})
+            # file title
+            f['title'] = x
+            # set local file and upload
+            print(f)
+            f.SetContentFile(os.path.join(path, x))
+            print(f)
+            # Upload to Google Drive
+            f.Upload()
+            print(f)
+
+            f = None
     @staticmethod
     def partition(df: DataFrame, part: str) -> DataFrame:
         part = part.lower()
@@ -32,7 +76,7 @@ class TaskTwo:
             partitions.append(dff)
         return partitions
 
-    def task22(self,output_directory_path: str, input_directory_path: str, languages: list) -> None:
+    def task22(self, output_directory_path: str, input_directory_path: str, languages: list) -> None:
         files = list_of_valid_files(input_directory_path=input_directory_path)
         # Check directories exist
         if (directory_checker(directory_path=input_directory_path, purpose="input") and
@@ -64,9 +108,8 @@ class TaskTwo:
                             output_path = full_path_generator(out_dir_path, f"{languages[i]}-{partition_name}.jsonl")
                             print(output_path)
                             save_to_jsonl(df=partitions[j], output_path=output_path, lines=True)
-                            json_object = json.loads("outputs\\train.json")
-                            print(json.dumps(json_object, indent=4))
                     else:
+
                         continue
 
         else:
@@ -75,12 +118,12 @@ class TaskTwo:
     import json
     df = DataFrame
 
-    def task23(self, lang_input_directory: str) -> json:
+    def task23(self) -> json:
         # check if the directory name ends in train
-        if lang_input_directory[-5:] == 'train':
+        if self.lang_input_directory[-5:] == 'train':
             df_list = []
             print('yes')
-            files = list_of_valid_files(input_directory_path=lang_input_directory)
+            files = list_of_valid_files(input_directory_path=self.lang_input_directory)
             # print(files)
             language_codes = []
             for i in range(len(files)):
@@ -88,7 +131,7 @@ class TaskTwo:
                 language_code = file[-15:-12]
                 language_codes.append(language_code)
                 new_df = dataframe_gen_from_jsonl(
-                    file_path=full_path_generator(directory_path=lang_input_directory, filepath=file))
+                    file_path=full_path_generator(directory_path=self.lang_input_directory, filepath=file))
                 new_df = new_df[["id", "utt"]]
                 new_df = new_df.rename(columns={"id": "id", "utt": f"{language_code}_utt"})
                 new_df = new_df[['id', f'{language_code}_utt']]
@@ -99,8 +142,21 @@ class TaskTwo:
             df.reset_index(drop=True, inplace=True)
             # Remove the redundant columns of the merged dataFrame
             df = df.loc[:, ~df.columns.duplicated()]
-            save_to_jsonl(df=df, output_path="outputs\\train.jsonl", lines=False)
-            return df
-
+            df = df.loc[:, ~df.columns.duplicated()]
+            df = df[['id', 'en_utt', 'de_utt', 'sw_utt']]
+            df.to_json("outputs\\train.json", orient="records", lines=True, force_ascii=False)
+            with open("../outputs/train.jsonl", "r") as read_file:
+                # print("Read JSON file")
+                jsonsl = json.load(read_file)
+                pretty_json = json.dumps(jsonsl, indent=4, separators=(',', ': '), ensure_ascii=False)
+                # print("Displaying Pretty Printed JSON Data")
+                json.dump(pretty_json, open("../outputs/trains.json", "w", encoding="utf8", errors="ignore"), indent=4,
+                          separators=(',', ': '), ensure_ascii=False)
+                return pretty_json
         else:
             raise Exception("Invalid directory")
+
+    def task24(self) :
+        functions.upload_to_gdrive(source_directory=self.output_directory_path, destination_folder_name="outputs",
+                                   parent_folder_name="cat1")
+

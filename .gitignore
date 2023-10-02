@@ -1,3 +1,6 @@
 /en-US.jsonl
 /data/
-/outputs/
+/outputs/*
+/client_secrets.json
+/credentials.txt
+/mycreds.txt

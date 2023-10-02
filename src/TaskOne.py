@@ -1,11 +1,14 @@
 import TaskHelpers
 from TaskHelpers import *
+import FileParsing
 
 
 class TaskOne:
     def __init__(self, input_directory_path: str, output_directory_path: str):
         self.input_directory_path = input_directory_path
         self.output_directory_path = output_directory_path
+        self.helper = TaskHelpers(input_directory_path=input_directory_path,
+                                  output_directory_path=output_directory_path)
 
     def excel_files_gen(self) -> list:
         """
@@ -17,12 +20,12 @@ class TaskOne:
         # Declare an empty list to store the Excel file names
         excel_files_paths = []
         # Looping through each file in the list of full paths
-        files = list_of_valid_files(input_directory_path=self.input_directory_path)
+        files = FileParsing.list_of_valid_files(input_directory_path=self.input_directory_path)
         # remove en-US.jsonl from the list of files
         files.remove("en-US.jsonl")
         for file in files:
             language_code = file[-11:-9]
-            df = TaskHelpers.per_language_pivot_en(filepath=file)
+            df = self.helper.per_language_pivot_en(filepath=file)
             # Output the dataframe to excel to specified output directory
             # the output name format is en-xx.xlsx where xx is the langauge code
             output_path = os.path.join(self.output_directory_path, f"en-{language_code}.xlsx")
@@ -31,8 +34,7 @@ class TaskOne:
 
     def generate(self) -> bool:
         # Getting the list of Excel file paths
-        excel_files_paths = self.excel_files_gen(input_directory_path=self.input_directory_path,
-                                                 output_directory_path=self.output_directory_path)
+        excel_files_paths = self.excel_files_gen()
         # Wrap in a try-catch block
         try:
             # Looping through each file path

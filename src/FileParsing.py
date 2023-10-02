@@ -2,28 +2,19 @@ import json
 import os
 import logging
 from pandas import DataFrame
+import pandas as pd
 from typing import *
 from TaskHelpers import *
 
 
 def dataframe_gen_from_jsonl(file_path: str) -> DataFrame:
-    df_dictionary: Dict[str, List[Any]] = {}
-    # read the file contents line by line
     try:
-        with open(file_path, "r") as file_input:
-            for line in file_input.readlines():
-                # convert it to a python dictionary
-                json_load = json.loads(line)
-                for (key, value) in json_load.items():
-                    if key not in df_dictionary:
-                        df_dictionary[key] = []
-                    df_dictionary[key].append(value)
-        df = pd.DataFrame(df_dictionary)
-        logging.info(f"Dataframe generated from {file_path}")
+        df = pd.read_json(file_path, orient='records', lines=True)
         return df
     except Exception as e:
         print(e)
         print(" " + "Something went wrong reading file" + f" {file_path}")
+        return pd.DataFrame()
 
 
 def df_to_excel(df: DataFrame, output_path: str) -> bool:
