@@ -8,7 +8,7 @@ class TaskTwo:
         self.input_directory_path = input_directory_path
         self.output_directory_path = output_directory_path
         self.lang_input_directory = os.path.join(output_directory_path, "train")
-
+'''
     def drive_upload(self):
         from pydrive.drive import GoogleDrive
         from pydrive.auth import GoogleAuth
@@ -59,6 +59,9 @@ class TaskTwo:
             print(f)
 
             f = None
+            
+    '''
+    
     @staticmethod
     def partition(df: DataFrame, part: str) -> DataFrame:
         part = part.lower()
